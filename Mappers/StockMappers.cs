@@ -25,11 +25,11 @@ namespace api.Mappers
         {
             return new Stock
             {
-                Symbol = dto.Symbol,
-                CompanyName = dto.CompanyName,
+                Symbol = dto.Symbol ?? string.Empty,
+                CompanyName = dto.CompanyName ?? string.Empty,
                 Purchase = dto.Purchase,
                 LastDiv = dto.LastDiv,
-                Industry = dto.Industry,
+                Industry = dto.Industry ?? string.Empty,
                 MarketCap = dto.MarketCap
             };
         }
@@ -55,6 +55,5 @@ namespace api.Mappers
             if (dto.MarketCap.HasValue)
                 stock.MarketCap = dto.MarketCap.Value;
         }
-
     }
 }
