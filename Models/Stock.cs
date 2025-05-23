@@ -19,7 +19,7 @@ namespace api.Models
         public decimal LastDiv { get; set; } // Last dividend
         public string Industry { get; set; } = string.Empty; // Industry
         public long MarketCap { get; set; } // Market capitalization
-        public List<Comment>? Comments { get; set; } = new List<Comment>(); // Navigation property for comments
+        public List<Comment> Comments { get; set; } = new List<Comment>(); // Navigation property for comments
         public bool IsDeleted { get; set; } = false; // Default to false
         public DateTime? DeletedAt { get; set; }
 

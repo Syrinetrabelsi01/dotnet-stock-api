@@ -8,6 +8,8 @@ using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Dtos.Stock;
+using api.Helpers;
+
 
 namespace api.Controllers
 {
@@ -25,26 +27,34 @@ namespace api.Controllers
             _context = context;
         }
 
-        //GET method to retrieve all stocks
-        // This method will return a list of all stocks in the database
-        [HttpGet("get")]
-        public async Task<IActionResult> GetStocks()
+        // GET method to retrieve all non-deleted stocks with filtering and sorting
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetStocks([FromQuery] QueryObject query)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stocks = await _context.Stocks
-                .Where(s => !s.IsDeleted) // 🧼 Show only active stocks
+                .Where(s => !s.IsDeleted)
+                .Include(c => c.Comments)
+                    .ThenInclude(a => a.AppUser)
+                .AsQueryable()
+                .Filter(query)
+                .Sort(query)
                 .Select(s => s.ToDto())
                 .ToListAsync();
 
             return Ok(stocks);
         }
 
-
-        //POST method to create a new stock
-        // This method will create a new stock object in the database
+        // POST method to create a new stock
         [HttpPost("create")]
         public async Task<IActionResult> CreateStock([FromBody] StockCreateDto stockDto)
         {
-            var stock = stockDto.ToModel(); // Convert DTO to Stock
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var stock = stockDto.ToModel();
 
             _context.Stocks.Add(stock);
             await _context.SaveChangesAsync();
@@ -56,17 +66,17 @@ namespace api.Controllers
             });
         }
 
-        //PUT method to update all fields
-        // This method will replace the entire stock object with the new one
-        [HttpPut("update/{id}")]
+        // PUT method to fully update a stock
+        [HttpPut("update/{id:int}")]
         public async Task<IActionResult> UpdateStock([FromRoute] int id, [FromBody] StockUpdateDto updateDto)
         {
-            var stock = await _context.Stocks.FindAsync(id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var stock = await _context.Stocks.FindAsync(id);
             if (stock == null)
                 return NotFound(new { message = "Stock not found" });
 
-            // Use mapper to apply updates
             stock.UpdateFromDto(updateDto);
 
             _context.Stocks.Update(stock);
@@ -79,16 +89,17 @@ namespace api.Controllers
             });
         }
 
-        //Patch method to update only the provided fields
-        // This method will only update the fields that are provided in the request body
+        // PATCH method to partially update a stock
         [HttpPatch("patch/{id}")]
         public async Task<IActionResult> PatchStock(int id, [FromBody] StockUpdateDto patchDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var stock = await _context.Stocks.FindAsync(id);
             if (stock == null)
                 return NotFound(new { message = $"Stock with id {id} not found" });
 
-            // Only update provided fields
             stock.UpdateFromDto(patchDto);
 
             _context.Stocks.Update(stock);
@@ -101,13 +112,11 @@ namespace api.Controllers
             });
         }
 
-        //DELETE method to delete a stock
-        // This method will delete the stock object from the database
-        [HttpDelete("delete/{id}")]
+        // DELETE method to permanently delete a stock
+        [HttpDelete("delete/{id:int}")]
         public async Task<IActionResult> DeleteStock(int id)
         {
             var stock = await _context.Stocks.FindAsync(id);
-
             if (stock == null)
                 return NotFound(new { message = $"Stock with id {id} not found" });
 
@@ -121,13 +130,11 @@ namespace api.Controllers
             });
         }
 
-        // Soft delete method to mark a stock as deleted
-        // This method will set the IsDeleted property to true
-        [HttpPatch("soft-delete/{id}")]
+        // PATCH method to soft-delete a stock
+        [HttpPatch("soft-delete/{id:int}")]
         public async Task<IActionResult> SoftDeleteStock(int id)
         {
             var stock = await _context.Stocks.FindAsync(id);
-
             if (stock == null)
                 return NotFound(new { message = $"Stock with id {id} not found" });
 
@@ -145,13 +152,11 @@ namespace api.Controllers
             });
         }
 
-        // Undo soft delete method to restore a soft-deleted stock
-        // This method will set the IsDeleted property to false
-        [HttpPatch("undo-soft-delete/{id}")]
+        // PATCH method to restore a soft-deleted stock
+        [HttpPatch("undo-soft-delete/{id:int}")]
         public async Task<IActionResult> UndoSoftDelete(int id)
         {
             var stock = await _context.Stocks.FindAsync(id);
-
             if (stock == null)
                 return NotFound(new { message = $"Stock with id {id} not found" });
 
@@ -169,9 +174,8 @@ namespace api.Controllers
             });
         }
 
-        //GET all stocks including soft-deleted ones
-        // This method will return a list of all stocks in the database, including soft-deleted ones
-        [HttpGet("get-all")]
+        // GET all stocks including soft-deleted ones
+        [HttpGet("get-all-stocks")]
         public async Task<IActionResult> GetAllStocks()
         {
             var stocks = await _context.Stocks
@@ -180,6 +184,5 @@ namespace api.Controllers
 
             return Ok(stocks);
         }
-        
     }
 }
