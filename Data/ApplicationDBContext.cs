@@ -1,19 +1,18 @@
 using api.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace api.Data
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDBContext : IdentityDbContext<AppUser>
     {
-        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
+            : base(options)
         {
-
         }
+
         public DbSet<Stock> Stocks { get; set; } = null!;
-        public DbSet<Comment> Comments { get; set; } = null!; 
+        public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Portfolio> Portfolios { get; set; } = null!;
     }
 }
