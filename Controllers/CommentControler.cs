@@ -51,7 +51,7 @@ namespace api.Controllers
         {
             var newComment = new Comment
             {
-                Id = _comments.Max(c => c.Id) + 1,
+                Id = _comments.Any() ? _comments.Max(c => c.Id) + 1 : 1,
                 Title = dto.Title,
                 Content = dto.Content,
                 CreatedOn = DateTime.Now,
