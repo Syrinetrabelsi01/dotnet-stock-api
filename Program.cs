@@ -1,10 +1,15 @@
+using System.Xml.Schema;
 using api.Data;
+using api.Interfaces;
 using api.Models;
+using api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +64,12 @@ builder.Services.AddAuthentication(options =>
             )
     };
 });
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+
+
 
 var app = builder.Build();
 
