@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Dtos.Stock;
 using api.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace api.Controllers
@@ -29,6 +30,7 @@ namespace api.Controllers
 
         // GET method to retrieve all non-deleted stocks with filtering and sorting
         [HttpGet("get-all")]
+        [Authorize]
         public async Task<IActionResult> GetStocks([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid)
