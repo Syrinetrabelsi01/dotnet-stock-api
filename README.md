@@ -17,34 +17,64 @@ This is a learning project I followed from YouTube, based on the [FinShark API b
 ## Project Structure
 
 ```
-├── Program.cs                      // App startup and configuration
+├── Program.cs                        // App entry point and configuration
+├── api.csproj                        // Project file with dependencies
+├── appsettings.json                  // Main config (connection strings, JWT keys)
+├── appsettings.Development.json      // Development-specific settings
 ├── Data/
-│   └── ApplicationDBContext.cs    // DbContext for EF Core
+│   └── ApplicationDBContext.cs       // EF Core DbContext
 ├── Models/
-│   ├── AppUser.cs                 // Identity user model
-│   ├── Stock.cs                   // Stock entity
-│   ├── Comment.cs                 // Comment entity
-│   └── Portfolio.cs               // Join table for user-stock relation
+│   ├── AppUser.cs                    // Identity user entity
+│   ├── Comment.cs                    // Comment entity
+│   ├── Portfolio.cs                  // Join entity: user <-> stock
+│   └── Stock.cs                      // Stock entity
 ├── Controllers/
-│   ├── StockController.cs         // Handles stock endpoints
-│   ├── CommentController.cs       // Handles comment endpoints
-│   └── PortfolioController.cs     // Handles user portfolio endpoints
-├── DTOs/
-│   ├── CreateCommentDto.cs        // DTO for creating a comment
-│   ├── StockDto.cs                // DTO for returning stock data
-│   └── PortfolioDto.cs            // DTO for portfolio actions
-├── Extensions/
-│   └── ClaimsExtensions.cs        // Helper to get user info from token
+│   ├── AccountController.cs          // Login & register endpoints
+│   ├── CommentController.cs          // Comment endpoints
+│   ├── PortfolioController.cs        // Portfolio endpoints
+│   └── StockController.cs            // Stock endpoints
+├── Dtos/
+│   ├── Account/                      // DTOs for account operations
+│   │   ├── LoginDto.cs
+│   │   ├── RegisterDto.cs
+│   │   └── NewUserDto.cs
+│   ├── Comment/                      // DTOs for comments
+│   │   ├── CommentDto.cs
+│   │   ├── CreateCommentDto.cs
+│   │   └── UpdateCommentRequestDto.cs
+│   └── Stock/                        // DTOs for stock
+│       ├── StockCreateDto.cs
+│       ├── StockDto.cs
+│       └── StockUpdateDto.cs
 ├── Interfaces/
-│   └── ITokenService.cs           // Interface for JWT service abstraction
-├── Services/
-│   └── TokenService.cs            // Responsible for creating JWT tokens
-├── Helpers/
-│   └── StockMapper.cs             // Maps between models and DTOs (if used)
-├── Migrations/                    // EF Core migrations
-├── appsettings.json               // Configuration file
-├── api.csproj                     // Project file
+│   ├── ICommentRepository.cs         // Comment repo interface
+│   ├── IFMPService.cs                // External stock API interface
+│   ├── IPortfolioRepository.cs       // Portfolio repo interface
+│   ├── IStockRepository.cs           // Stock repo interface
+│   └── ITokenService.cs              // JWT service interface
+├── Repository/
+│   ├── CommentRepository.cs          // Handles DB logic for comments
+│   ├── PortfolioRepository.cs        // Handles DB logic for portfolios
+│   └── StockRepository.cs            // Handles DB logic for stocks
+├── Service/
+│   ├── FMPService.cs                 // External stock market API service
+│   └── TokenService.cs              // JWT token generation logic
+├── Mappers/
+│   ├── CommentMapper.cs              // Maps Comment ↔ CommentDto
+│   └── StockMappers.cs               // Maps Stock ↔ StockDto
+├── Helper/
+│   ├── CommentQueryObject.cs         // Filtering logic for comments
+│   ├── QueryObject.cs                // Generic query filters
+│   └── StockExtensions.cs            // Helper methods for stock logic
+├── Extensions/
+│   └── ClaimsExtensions.cs           // Extracts claims from JWT
+├── Migrations/                       // EF Core DB migrations
+│   ├── [timestamp]_*.cs              // Auto-generated migration scripts
+│   └── ApplicationDBContextModelSnapshot.cs
+├── Properties/
+│   └── launchSettings.json           // Launch profiles for development
 ```
+
 
 ---
 
